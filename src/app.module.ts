@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as redisStore from 'cache-manager-ioredis';
-import { UserModule } from './user/user.module';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaService } from './database/prisma/prisma.service';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // ConfigModule disponível globalmente
+      isGlobal: true,
     }),
 
     CacheModule.registerAsync({
