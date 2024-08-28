@@ -5,18 +5,10 @@ import { UpdateTutorialDto } from '../dtos/update-tutorial.dto';
 import { FilterTutorialDto } from '../dtos/filter-tutorial.dto';
 
 @Injectable()
-export class TutorialsService {
-  constructor(private readonly prisma: PrismaService) { }
+export class TutorialRepository {
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createTutorialDto: CreateTutorialDto) {
-    const existingTutorial = await this.prisma.tutorial.findUnique({
-      where: { title: createTutorialDto.title },
-    });
-
-    if (existingTutorial) {
-      throw new Error('Um tutorial com esse título já existe');
-    }
-
     return this.prisma.tutorial.create({
       data: {
         title: createTutorialDto.title,
@@ -28,13 +20,19 @@ export class TutorialsService {
     });
   }
 
+  async findByTitle(title: string) {
+    return this.prisma.tutorial.findUnique({
+      where: { title },
+    });
+  }
+
   async findAll(filter: FilterTutorialDto) {
     const where: any = {};
 
     if (filter.title) {
       where.title = {
         contains: filter.title,
-        mode: 'insensitive', // Torna a pesquisa case-insensitive
+        mode: 'insensitive',
       };
     }
 
@@ -65,38 +63,18 @@ export class TutorialsService {
     });
   }
 
-  async findOne(id: string) {
+  async findById(id: string) {
     return this.prisma.tutorial.findUnique({
       where: { id },
     });
   }
 
   async update(id: string, updateTutorialDto: UpdateTutorialDto) {
-    const tutorial = await this.prisma.tutorial.findUnique({
-      where: { id },
-    });
-
-    if (!tutorial) {
-      throw new Error(`Tutorial com id ${id} não encontrado`);
-    }
-
-    if (updateTutorialDto.title && updateTutorialDto.title !== tutorial.title) {
-      const existingTutorial = await this.prisma.tutorial.findUnique({
-        where: { title: updateTutorialDto.title },
-      });
-
-      if (existingTutorial) {
-        throw new Error('Um tutorial com esse título já existe');
-      }
-    }
-
     return this.prisma.tutorial.update({
       where: { id },
       data: {
         ...updateTutorialDto,
-        user: {
-          connect: { id: updateTutorialDto.userId },
-        },
+        userId: updateTutorialDto.userId,
       },
     });
   }

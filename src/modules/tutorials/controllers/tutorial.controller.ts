@@ -8,7 +8,7 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { TutorialsService } from '../services/tutorials.service';
+import { TutorialsService } from '../services/tutorial.service';
 import { CreateTutorialDto } from '../dtos/create-tutorial.dto';
 import { FilterTutorialDto } from '../dtos/filter-tutorial.dto';
 import { UpdateTutorialDto } from '../dtos/update-tutorial.dto';

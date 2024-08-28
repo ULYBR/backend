@@ -1,53 +1,33 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from 'src/database/prisma/prisma.service';
-import { CreateUserDto } from '../dtos/create-user.dto';
-import { LoginUserDto } from '../dtos/login-user.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import {
-  CreateUserSchema,
-  LoginUserSchema,
-} from '../../../validation/user.validation';
+import { UserRepository } from '../repositories/user.repository';
+import { CreateUserDto } from '../dtos/create-user.dto';
+import { LoginUserDto } from '../dtos/login-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto) {
-    const parsedData = CreateUserSchema.safeParse(createUserDto);
-    if (!parsedData.success) {
-      throw new BadRequestException(parsedData.error.errors);
-    }
-
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
 
-    return this.prisma.user.create({
-      data: {
-        username: createUserDto.username,
-        password: hashedPassword,
-      },
+    return this.userRepository.createUser({
+      ...createUserDto,
+      password: hashedPassword,
     });
   }
 
   async loginUser(
     loginUserDto: LoginUserDto,
   ): Promise<{ access_token: string }> {
-    const parsedData = LoginUserSchema.safeParse(loginUserDto);
-    if (!parsedData.success) {
-      throw new BadRequestException(parsedData.error.errors);
-    }
-
-    const user = await this.prisma.user.findUnique({
-      where: { username: loginUserDto.username },
-    });
+    const user = await this.userRepository.findUserByUsername(
+      loginUserDto.username,
+    );
 
     if (
       !user ||
@@ -66,7 +46,7 @@ export class UserService {
     try {
       const payload = this.jwtService.verify(token);
       return !!payload;
-    } catch (error) {
+    } catch {
       return false;
     }
   }

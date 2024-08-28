@@ -4,6 +4,7 @@ import { UserService } from './services/user.service';
 import { UserController } from './controllers/user.controller';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserRepository } from './repositories/user.repository';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
   ],
-  providers: [UserService, PrismaService],
+  providers: [UserService, PrismaService, UserRepository],
   controllers: [UserController],
 })
 export class UserModule {}
