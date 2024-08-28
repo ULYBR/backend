@@ -1,85 +1,231 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+---
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# Aplicação Backend
+
+## Descrição
+
+Este projeto é uma API desenvolvida com NestJS, utilizando PostgreSQL como banco de dados e Prisma como ORM. A API fornece endpoints para gerenciar usuários e tutoriais, incluindo operações de criação, leitura, atualização e exclusão (CRUD). Além disso, a API possui autenticação JWT para segurança e documentação gerada automaticamente pelo Swagger.
+
+## Pré-requisitos
+
+- Node.js (versão 14 ou superior)
+- Docker
+- Docker Compose
+
+## Instruções de Uso
+
+### 1. Clonar o Repositório
+
+```bash
+git clone https://github.com/ULYBR/backend.git
+cd backend
+```
+
+### 2. Configurar as Variáveis de Ambiente
+
+Renomeie o arquivo `.env.example` para `.env` e ajuste as variáveis de ambiente conforme necessário:
+
+```bash
+mv .env.example .env
+```
+
+O arquivo `.env` deve conter as seguintes variáveis:
+
+```env
+POSTGRES_USER=username
+POSTGRES_PASSWORD=password
+POSTGRES_DB=backend
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
+JWT_SECRET="sua_chave_secreta_aqui"
+```
+
+### 3. Subir o Ambiente com Docker
+
+Execute o comando abaixo para subir o ambiente usando Docker Compose:
+
+```bash
+docker-compose up -d
+```
+
+Isso iniciará os serviços do PostgreSQL e do Redis definidos no `docker-compose.yml`.
+
+### 4. Instalar as Dependências
+
+Se ainda não tiver feito isso, instale as dependências do projeto:
+
+```bash
+npm install
+```
+
+### 5. Executar as Migrações do Banco de Dados
+
+Para criar as tabelas no banco de dados, execute as migrações do Prisma:
+
+```bash
+npx prisma migrate dev
+```
+
+### 6. Iniciar o Servidor
+
+Para iniciar o servidor em modo de desenvolvimento, execute:
+
+```bash
+npm run start:dev
+```
+
+O servidor estará disponível em `http://localhost:3000`.
+
+### 7. Documentação da API
+
+A documentação da API gerada pelo Swagger está disponível em:
+
+```
+http://localhost:3000/api/docs
+```
+
+### 8. Testes
+
+Para rodar os testes da aplicação, use o comando:
+
+```bash
+npm test
+```
+
+## Endpoints da API
+
+### 1. Usuários
+
+- **POST /user/signup**: Cria um novo usuário.
+- **POST /user/login**: Realiza o login e retorna um token JWT.
+
+### 2. Tutoriais
+
+- **POST /tutorial**: Cria um novo tutorial.
+- **GET /tutorial**: Retorna uma lista de tutoriais com suporte a filtros.
+- **GET /tutorial/:id**: Retorna os detalhes de um tutorial específico.
+- **PATCH /tutorial/:id**: Atualiza um tutorial existente.
+- **DELETE /tutorial/:id**: Remove um tutorial.
+
+### Exemplo de Requisição
+
+```bash
+curl -X POST http://localhost:3000/tutorial -H "Content-Type: application/json" -d '{"title": "NestJS Basics", "content": "Learn the basics of NestJS", "userId": "1"}'
+```
+
+---
+
+# Backend Application
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This project is an API developed with NestJS, using PostgreSQL as the database and Prisma as the ORM. The API provides endpoints to manage users and tutorials, including Create, Read, Update, and Delete (CRUD) operations. Additionally, the API features JWT authentication for security and automatically generated documentation with Swagger.
 
-## Project setup
+## Prerequisites
 
-```bash
-$ npm install
-```
+- Node.js (version 14 or higher)
+- Docker
+- Docker Compose
 
-## Compile and run the project
+## Usage Instructions
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
+### 1. Clone the Repository
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+git clone https://github.com/ULYBR/backend.git
+cd backend
 ```
 
-## Resources
+### 2. Configure Environment Variables
 
-Check out a few resources that may come in handy when working with NestJS:
+Rename the `.env.example` file to `.env` and adjust the environment variables as needed:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+mv .env.example .env
+```
 
-## Support
+The `.env` file should contain the following variables:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```env
+POSTGRES_USER=username
+POSTGRES_PASSWORD=password
+POSTGRES_DB=backend
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
+JWT_SECRET="your_secret_key_here"
+```
 
-## Stay in touch
+### 3. Start the Environment with Docker
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Run the command below to start the environment using Docker Compose:
 
-## License
+```bash
+docker-compose up -d
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This will start the PostgreSQL and Redis services defined in the `docker-compose.yml`.
+
+### 4. Install Dependencies
+
+If you haven't done so already, install the project dependencies:
+
+```bash
+npm install
+```
+
+### 5. Run Database Migrations
+
+To create the tables in the database, run the Prisma migrations:
+
+```bash
+npx prisma migrate dev
+```
+
+### 6. Start the Server
+
+To start the server in development mode, run:
+
+```bash
+npm run start:dev
+```
+
+The server will be available at `http://localhost:3000`.
+
+### 7. API Documentation
+
+The API documentation generated by Swagger is available at:
+
+```
+http://localhost:3000/api/docs
+```
+
+### 8. Tests
+
+To run the application tests, use the command:
+
+```bash
+npm test
+```
+
+## API Endpoints
+
+### 1. Users
+
+- **POST /user/signup**: Creates a new user.
+- **POST /user/login**: Logs in a user and returns a JWT token.
+
+### 2. Tutorials
+
+- **POST /tutorial**: Creates a new tutorial.
+- **GET /tutorial**: Returns a list of tutorials with support for filtering.
+- **GET /tutorial/:id**: Returns the details of a specific tutorial.
+- **PATCH /tutorial/:id**: Updates an existing tutorial.
+- **DELETE /tutorial/:id**: Removes a tutorial.
+
+### Request Example
+
+```bash
+curl -X POST http://localhost:3000/tutorial -H "Content-Type: application/json" -d '{"title": "NestJS Basics", "content": "Learn the basics of NestJS", "userId": "1"}'
+```
+
+---
+
