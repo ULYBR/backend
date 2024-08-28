@@ -1,5 +1,4 @@
-import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { LoginUserDto } from '../dtos/login-user.dto';
@@ -11,7 +10,6 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async createUser(createUserDto: CreateUserDto) {
@@ -43,13 +41,15 @@ export class UserService {
     const payload = { username: user.username, sub: user.id };
     const token = this.jwtService.sign(payload);
 
-    await this.cacheManager.set(token, payload, 3600);
-
     return { access_token: token };
   }
 
   async validateToken(token: string): Promise<boolean> {
-    const cachedToken = await this.cacheManager.get(token);
-    return !!cachedToken;
+    try {
+      const payload = this.jwtService.verify(token);
+      return !!payload;
+    } catch (error) {
+      return false;
+    }
   }
 }

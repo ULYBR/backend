@@ -1,10 +1,5 @@
-import {
-  IsOptional,
-  IsString,
-  IsDateString,
-  IsInt,
-  Min,
-} from 'class-validator';
+import { IsOptional, IsString, IsDate, IsInt, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class FilterTutorialDto {
   @IsOptional()
@@ -12,20 +7,22 @@ export class FilterTutorialDto {
   title?: string;
 
   @IsOptional()
-  @IsDateString()
-  createdAfter?: string;
+  @IsDate()
+  @Type(() => Date)
+  startDate?: Date;
 
   @IsOptional()
-  @IsDateString()
-  updatedAfter?: string;
+  @IsDate()
+  @Type(() => Date)
+  endDate?: Date;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  skip?: number;
 
   @IsOptional()
   @IsInt()
   @Min(1)
-  page?: number = 1;
-
-  @IsOptional()
-  @IsInt()
-  @Min(1)
-  limit?: number = 10;
+  take?: number;
 }

@@ -1,29 +1,14 @@
 import { Module } from '@nestjs/common';
-import { CacheModule } from '@nestjs/cache-manager';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as redisStore from 'cache-manager-redis-store';
-import { PrismaService } from './database/prisma/prisma.service';
+import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/user/user.module';
 import { TutorialsModule } from './modules/tutorials/tutorials.module';
+import { PrismaService } from './database/prisma/prisma.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
-    CacheModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get<string>('REDIS_HOST'),
-        port: configService.get<number>('REDIS_PORT'),
-        ttl: configService.get<number>('REDIS_TTL') * 1000,
-      }),
-      inject: [ConfigService],
-      isGlobal: true,
-    }),
-
     UserModule,
     TutorialsModule,
   ],

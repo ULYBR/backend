@@ -1,47 +1,62 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import { CreateTutorialDto } from '../dtos/create-tutorial.dto';
-import { FilterTutorialDto } from '../dtos/filter-tutorial.dto';
 import { UpdateTutorialDto } from '../dtos/update-tutorial.dto';
+import { FilterTutorialDto } from '../dtos/filter-tutorial.dto';
 
 @Injectable()
 export class TutorialsService {
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createTutorialDto: CreateTutorialDto) {
+    const existingTutorial = await this.prisma.tutorial.findUnique({
+      where: { title: createTutorialDto.title },
+    });
+
+    if (existingTutorial) {
+      throw new Error('Um tutorial com esse título já existe');
+    }
+
     return this.prisma.tutorial.create({
       data: createTutorialDto,
     });
   }
 
-  async findAll(filterDto: FilterTutorialDto) {
-    const { title, createdAfter, updatedAfter, page, limit } = filterDto;
+  async findAll(filter: FilterTutorialDto) {
+    const where: any = {};
 
-    const cacheKey = `tutorials_${JSON.stringify(filterDto)}`;
-    const cachedData = await this.cacheManager.get(cacheKey);
-    if (cachedData) {
-      return cachedData;
+    if (filter.title) {
+      where.title = {
+        contains: filter.title,
+        mode: 'insensitive', // Torna a pesquisa case-insensitive
+      };
     }
 
-    const where = {
-      ...(title && { title: { contains: title } }),
-      ...(createdAfter && { createdAt: { gte: new Date(createdAfter) } }),
-      ...(updatedAfter && { updatedAt: { gte: new Date(updatedAfter) } }),
-    };
+    if (filter.startDate && filter.endDate) {
+      where.OR = [
+        {
+          createdAt: {
+            gte: filter.startDate,
+            lte: filter.endDate,
+          },
+        },
+        {
+          updatedAt: {
+            gte: filter.startDate,
+            lte: filter.endDate,
+          },
+        },
+      ];
+    }
 
-    const tutorials = await this.prisma.tutorial.findMany({
+    return this.prisma.tutorial.findMany({
       where,
-      skip: (page - 1) * limit,
-      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: filter.skip || 0,
+      take: filter.take || 10,
     });
-
-    await this.cacheManager.set(cacheKey, tutorials, 60000);
-
-    return tutorials;
   }
 
   async findOne(id: string) {
@@ -51,6 +66,24 @@ export class TutorialsService {
   }
 
   async update(id: string, updateTutorialDto: UpdateTutorialDto) {
+    const tutorial = await this.prisma.tutorial.findUnique({
+      where: { id },
+    });
+
+    if (!tutorial) {
+      throw new Error(`Tutorial com id ${id} não encontrado`);
+    }
+
+    if (updateTutorialDto.title && updateTutorialDto.title !== tutorial.title) {
+      const existingTutorial = await this.prisma.tutorial.findUnique({
+        where: { title: updateTutorialDto.title },
+      });
+
+      if (existingTutorial) {
+        throw new Error('Um tutorial com esse título já existe');
+      }
+    }
+
     return this.prisma.tutorial.update({
       where: { id },
       data: updateTutorialDto,

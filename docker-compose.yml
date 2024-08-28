@@ -1,20 +1,6 @@
 version: '3.7'
 
 services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-      - redis
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      REDIS_TTL: ${REDIS_TTL}
-
   db:
     image: postgres
     environment:
@@ -23,8 +9,3 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
-
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
