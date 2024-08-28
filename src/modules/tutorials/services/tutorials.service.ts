@@ -6,7 +6,7 @@ import { FilterTutorialDto } from '../dtos/filter-tutorial.dto';
 
 @Injectable()
 export class TutorialsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createTutorialDto: CreateTutorialDto) {
     const existingTutorial = await this.prisma.tutorial.findUnique({
@@ -18,7 +18,13 @@ export class TutorialsService {
     }
 
     return this.prisma.tutorial.create({
-      data: createTutorialDto,
+      data: {
+        title: createTutorialDto.title,
+        content: createTutorialDto.content,
+        user: {
+          connect: { id: createTutorialDto.userId },
+        },
+      },
     });
   }
 
@@ -86,7 +92,12 @@ export class TutorialsService {
 
     return this.prisma.tutorial.update({
       where: { id },
-      data: updateTutorialDto,
+      data: {
+        ...updateTutorialDto,
+        user: {
+          connect: { id: updateTutorialDto.userId },
+        },
+      },
     });
   }
 
